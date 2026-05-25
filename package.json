@@ -1,0 +1,16 @@
+{
+  "name": "tw-payment-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "台灣電子支付管理平台",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "deploy": "cd frontend && npm run deploy"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
