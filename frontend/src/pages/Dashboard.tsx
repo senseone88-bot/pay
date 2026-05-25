@@ -82,6 +82,7 @@ export default function Dashboard() {
           <StatsCard
             icon={<ShoppingCart size={24} color="#2563eb" />}
             iconBg="#dbeafe"
+            iconColor="#2563eb"
             label="總訂單數"
             value={String(stats.totalOrders)}
             change={`待處理: ${stats.pendingOrders}`}
@@ -90,6 +91,7 @@ export default function Dashboard() {
           <StatsCard
             icon={<DollarSign size={24} color="#16a34a" />}
             iconBg="#dcfce7"
+            iconColor="#16a34a"
             label="總收入"
             value={formatNTD(stats.totalRevenue)}
             change={`本日: ${formatNTD(stats.todayRevenue)}`}
@@ -98,12 +100,14 @@ export default function Dashboard() {
           <StatsCard
             icon={<CheckCircle size={24} color="#16a34a" />}
             iconBg="#dcfce7"
+            iconColor="#16a34a"
             label="成功付款"
             value={String(stats.successfulPayments)}
           />
           <StatsCard
             icon={<XCircle size={24} color="#dc2626" />}
             iconBg="#fef2f2"
+            iconColor="#dc2626"
             label="付款失敗"
             value={String(stats.failedPayments)}
           />

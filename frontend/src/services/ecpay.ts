@@ -24,9 +24,9 @@ function generateCheckMacCode(params: Record<string, string>, hashKey: string, h
   const encoded = encodeURIComponent(raw).toLowerCase();
   let step = encoded;
   for (const c of ["%2d", "%5f", "%2e", "%21", "%2a", "%28", "%29"]) {
-    step = step.replaceAll(c, "");
+    step = step.split(c).join("");
   }
-  step = step.replaceAll("%7e", "~");
+  step = step.split("%7e").join("~");
   return step;
 }
 
