@@ -1,44 +1,33 @@
-import axios, { AxiosInstance, AxiosError } from "axios";
 import type {
-  ApiResponse,
   Order,
   CreateOrderRequest,
   PaymentResult,
   DashboardStats,
   PaymentGatewayConfig,
 } from "../types/payment";
+import { mockData } from "./mockData";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api";
+const USE_MOCK = !import.meta.env.VITE_API_BASE_URL;
 
 class PaymentApi {
-  private client: AxiosInstance;
+  private useMock = USE_MOCK;
 
   constructor() {
-    this.client = axios.create({
-      baseURL: API_BASE,
-      timeout: 30000,
-      headers: { "Content-Type": "application/json" },
-    });
-
-    this.client.interceptors.response.use(
-      (res) => res,
-      (err: AxiosError<ApiResponse<never>>) => {
-        const msg =
-          err.response?.data?.error || err.message || "請求失敗";
-        return Promise.reject(new Error(msg));
-      }
-    );
-  }
-
-  setToken(token: string) {
-    this.client.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    if (USE_MOCK) {
+      console.log("[API] 使用示範模式 (Mock Data)");
+    }
   }
 
   async getDashboardStats(): Promise<DashboardStats> {
-    const { data } = await this.client.get<ApiResponse<DashboardStats>>(
-      "/dashboard/stats"
-    );
-    return data.data!;
+    if (this.useMock) return mockData.getDashboardStats();
+    try {
+      const { default: axios } = await import("axios");
+      const { data } = await axios.get("/api/dashboard/stats");
+      return data.data;
+    } catch {
+      this.useMock = true;
+      return mockData.getDashboardStats();
+    }
   }
 
   async getOrders(params?: {
@@ -47,51 +36,84 @@ class PaymentApi {
     status?: string;
     provider?: string;
   }): Promise<{ orders: Order[]; total: number; page: number }> {
-    const { data } = await this.client.get<ApiResponse<{
-      orders: Order[];
-      total: number;
-      page: number;
-    }>>("/orders", { params });
-    return data.data!;
+    if (this.useMock) return mockData.getOrders(params);
+    try {
+      const { default: axios } = await import("axios");
+      const { data } = await axios.get("/api/orders", { params });
+      return data.data;
+    } catch {
+      this.useMock = true;
+      return mockData.getOrders(params);
+    }
   }
 
   async getOrder(id: string): Promise<Order> {
-    const { data } = await this.client.get<ApiResponse<Order>>(
-      `/orders/${id}`
-    );
-    return data.data!;
+    if (this.useMock) {
+      const order = mockData.getOrder(id);
+      if (!order) throw new Error("訂單不存在");
+      return order;
+    }
+    try {
+      const { default: axios } = await import("axios");
+      const { data } = await axios.get(`/api/orders/${id}`);
+      return data.data;
+    } catch {
+      this.useMock = true;
+      const order = mockData.getOrder(id);
+      if (!order) throw new Error("訂單不存在");
+      return order;
+    }
   }
 
   async createOrder(req: CreateOrderRequest): Promise<PaymentResult> {
-    const { data } = await this.client.post<ApiResponse<PaymentResult>>(
-      "/orders",
-      req
-    );
-    return data.data!;
+    if (this.useMock) return mockData.createOrder(req);
+    try {
+      const { default: axios } = await import("axios");
+      const { data } = await axios.post("/api/orders", req);
+      return data.data;
+    } catch {
+      this.useMock = true;
+      return mockData.createOrder(req);
+    }
   }
 
   async getPaymentGateways(): Promise<PaymentGatewayConfig[]> {
-    const { data } = await this.client.get<
-      ApiResponse<PaymentGatewayConfig[]>
-    >("/payments/gateways");
-    return data.data!;
+    if (this.useMock) return mockData.getGateways();
+    try {
+      const { default: axios } = await import("axios");
+      const { data } = await axios.get("/api/payments/gateways");
+      return data.data;
+    } catch {
+      this.useMock = true;
+      return mockData.getGateways();
+    }
   }
 
   async updatePaymentGateway(
     provider: string,
     config: Partial<PaymentGatewayConfig>
   ): Promise<PaymentGatewayConfig> {
-    const { data } = await this.client.put<
-      ApiResponse<PaymentGatewayConfig>
-    >(`/payments/gateways/${provider}`, config);
-    return data.data!;
+    if (this.useMock) return mockData.updateGateway(provider, config);
+    try {
+      const { default: axios } = await import("axios");
+      const { data } = await axios.put(`/api/payments/gateways/${provider}`, config);
+      return data.data;
+    } catch {
+      this.useMock = true;
+      return mockData.updateGateway(provider, config);
+    }
   }
 
   async refundOrder(orderId: string): Promise<PaymentResult> {
-    const { data } = await this.client.post<ApiResponse<PaymentResult>>(
-      `/orders/${orderId}/refund`
-    );
-    return data.data!;
+    if (this.useMock) return mockData.refundOrder(orderId);
+    try {
+      const { default: axios } = await import("axios");
+      const { data } = await axios.post(`/api/orders/${orderId}/refund`);
+      return data.data;
+    } catch {
+      this.useMock = true;
+      return mockData.refundOrder(orderId);
+    }
   }
 }
 
